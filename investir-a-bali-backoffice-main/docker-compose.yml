@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+  frontend:
+    build:
+      context: .
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ../investir-a-bali-backoffice-backend-main
+    ports:
+      - "5001:5001"
+    environment:
+      - MONGO_URI=mongodb://db:27017/BEA_BO_db
+      - JWT_SECRET=BEAsecretkey12345                    # Secret JWT pour le backend
+      - EMAIL_USER=sassiyossr3@gmail.com                # Utilisateur pour l'email
+      - EMAIL_PASS=heex fian sdfm zbqa                  # Mot de passe de l'email
+      - PORT=5001    
+    networks:
+      - app-network
+    command: sh -c "sleep 15 && node index.js"
+
+
+  db:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db                      # Persister les données de MongoDB
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  app-network:
+    driver: bridge
